@@ -22,9 +22,11 @@ interface AppState {
   profile: UserProfile;
   settings: AISettings;
   sidebarOpen: boolean;
+  darkMode: boolean;
 
   setPage: (page: Page) => void;
   setSidebarOpen: (open: boolean) => void;
+  toggleDarkMode: () => void;
   createNewChat: () => void;
   selectChat: (id: string) => void;
   deleteChat: (id: string) => void;
@@ -46,6 +48,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   currentChatId: null,
   chats: [],
   sidebarOpen: true,
+  darkMode: false,
   profile: {
     name: 'Пользователь',
     email: 'user@example.com',
@@ -59,6 +62,12 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   setPage: (page) => set({ currentPage: page }),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
+  toggleDarkMode: () =>
+    set((s) => {
+      const next = !s.darkMode;
+      document.documentElement.classList.toggle('dark', next);
+      return { darkMode: next };
+    }),
 
   createNewChat: () => {
     const chat = createChat();

@@ -33,7 +33,7 @@ export default function Sidebar() {
       >
         <div className="flex items-center justify-between px-4 py-4 border-b border-border shrink-0">
           {sidebarOpen && (
-            <span className="text-sm font-medium tracking-tight">Юра ИИ</span>
+            <span className="text-sm font-medium tracking-tight">Elf</span>
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
