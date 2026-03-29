@@ -33,7 +33,21 @@ export default function Sidebar() {
       >
         <div className="flex items-center justify-between px-4 py-4 border-b border-border shrink-0">
           {sidebarOpen && (
-            <span className="text-sm font-medium tracking-tight">Elf</span>
+            <div className="flex items-center gap-2.5">
+              <img
+                src="https://cdn.poehali.dev/projects/09367e5e-7b11-4a2c-b8e8-41a6e16fe269/bucket/01359b2f-a2da-4fab-b7b2-be1f544851c5.jpeg"
+                alt="Elf"
+                className="w-7 h-7 rounded-full object-cover object-top ring-1 ring-border"
+              />
+              <span className="text-sm font-medium tracking-tight">Elf</span>
+            </div>
+          )}
+          {!sidebarOpen && (
+            <img
+              src="https://cdn.poehali.dev/projects/09367e5e-7b11-4a2c-b8e8-41a6e16fe269/bucket/01359b2f-a2da-4fab-b7b2-be1f544851c5.jpeg"
+              alt="Elf"
+              className="w-7 h-7 rounded-full object-cover object-top ring-1 ring-border mx-auto"
+            />
           )}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -50,7 +64,7 @@ export default function Sidebar() {
               onClick={() => setPage(item.id)}
               className={`nav-item w-full text-left ${
                 currentPage === item.id
-                  ? 'bg-accent text-foreground font-medium'
+                  ? 'sidebar-item-active'
                   : 'text-muted-foreground hover:bg-accent hover:text-foreground'
               }`}
             >

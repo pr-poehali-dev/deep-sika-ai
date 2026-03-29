@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import Icon from '@/components/ui/icon';
 
+const ELF_AVATAR = "https://cdn.poehali.dev/projects/09367e5e-7b11-4a2c-b8e8-41a6e16fe269/bucket/01359b2f-a2da-4fab-b7b2-be1f544851c5.jpeg";
+
 function formatTime(date: Date) {
   return new Intl.DateTimeFormat('ru', { hour: '2-digit', minute: '2-digit' }).format(date);
 }
@@ -56,10 +58,14 @@ export default function ChatPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-xl">
           <div className="mb-10 text-center animate-fade-in">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-foreground mb-5">
-              <Icon name="Sparkles" size={20} className="text-background" />
+            <div className="inline-flex items-center justify-center mb-5">
+              <img
+                src={ELF_AVATAR}
+                alt="Elf"
+                className="w-20 h-20 rounded-2xl object-cover object-top ring-2 ring-border shadow-sm"
+              />
             </div>
-            <h1 className="text-2xl font-light tracking-tight mb-2">Чем могу помочь?</h1>
+            <h1 className="text-2xl font-light tracking-tight mb-2">Привет, я Elf ✨</h1>
             <p className="text-sm text-muted-foreground">Начните диалог — я запомню контекст беседы</p>
           </div>
 
@@ -102,9 +108,11 @@ export default function ChatPage() {
               className={`flex gap-3 animate-fade-in ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
             >
               {msg.role === 'assistant' && (
-                <div className="shrink-0 w-7 h-7 rounded-full bg-foreground flex items-center justify-center mt-0.5">
-                  <Icon name="Sparkles" size={12} className="text-background" />
-                </div>
+                <img
+                  src={ELF_AVATAR}
+                  alt="Elf"
+                  className="shrink-0 w-7 h-7 rounded-full object-cover object-top mt-0.5 ring-1 ring-border"
+                />
               )}
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
@@ -123,9 +131,11 @@ export default function ChatPage() {
 
           {isTyping && (
             <div className="flex gap-3 animate-fade-in">
-              <div className="shrink-0 w-7 h-7 rounded-full bg-foreground flex items-center justify-center">
-                <Icon name="Sparkles" size={12} className="text-background" />
-              </div>
+              <img
+                src={ELF_AVATAR}
+                alt="Elf"
+                className="shrink-0 w-7 h-7 rounded-full object-cover object-top ring-1 ring-border"
+              />
               <div className="bg-card border border-border rounded-2xl rounded-tl-sm px-4 py-3">
                 <div className="flex gap-1 items-center h-5">
                   <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -178,7 +188,8 @@ function ChatInput({
       <button
         onClick={onSend}
         disabled={!input.trim()}
-        className="shrink-0 w-8 h-8 rounded-xl bg-foreground text-background flex items-center justify-center disabled:opacity-30 hover:bg-foreground/80 transition-all duration-150 mb-0.5"
+        className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center disabled:opacity-30 transition-all duration-150 mb-0.5"
+        style={{ background: 'hsl(var(--elf-green))', color: 'white' }}
       >
         <Icon name="ArrowUp" size={15} />
       </button>
