@@ -9,9 +9,8 @@ function formatTime(date: Date) {
 }
 
 export default function ChatPage() {
-  const { chats, currentChatId, sendMessage, createNewChat } = useAppStore();
+  const { chats, currentChatId, sendMessage, createNewChat, isLoading } = useAppStore();
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -20,20 +19,11 @@ export default function ChatPage() {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  useEffect(() => {
-    const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.role === 'user') {
-      setIsTyping(true);
-    } else {
-      setIsTyping(false);
-    }
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const handleSend = () => {
     const text = input.trim();
-    if (!text) return;
+    if (!text || isLoading) return;
     if (!currentChatId) createNewChat();
     setInput('');
     sendMessage(text);
@@ -129,7 +119,7 @@ export default function ChatPage() {
             </div>
           ))}
 
-          {isTyping && (
+          {isLoading && (
             <div className="flex gap-3 animate-fade-in">
               <img
                 src={ELF_AVATAR}
@@ -188,7 +178,7 @@ function ChatInput({
       <button
         onClick={onSend}
         disabled={!input.trim()}
-        className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center disabled:opacity-30 transition-all duration-150 mb-0.5"
+        className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center disabled:opacity-30 transition-all duration-150 mb-0.5 hover:opacity-85"
         style={{ background: 'hsl(var(--elf-green))', color: 'white' }}
       >
         <Icon name="ArrowUp" size={15} />

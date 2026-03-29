@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { Chat, Message, Page, UserProfile, AISettings } from '@/types';
 
+const CHAT_URL = 'https://functions.poehali.dev/aa25c82b-2727-4e9c-8d34-9cb5b1602fbc';
+
 function generateId() {
   return Math.random().toString(36).slice(2, 11);
 }
@@ -23,6 +25,7 @@ interface AppState {
   settings: AISettings;
   sidebarOpen: boolean;
   darkMode: boolean;
+  isLoading: boolean;
 
   setPage: (page: Page) => void;
   setSidebarOpen: (open: boolean) => void;
@@ -35,20 +38,13 @@ interface AppState {
   updateSettings: (settings: Partial<AISettings>) => void;
 }
 
-const DEMO_RESPONSES = [
-  'Понял вас. Это действительно интересный вопрос — давайте разберём по шагам.',
-  'Отличный вопрос. Здесь важно учесть несколько ключевых аспектов.',
-  'Согласен с вашим подходом. Вот что я думаю по этому поводу.',
-  'Обработал ваш запрос. Вот структурированный ответ.',
-  'Хороший вопрос. Позвольте предложить несколько вариантов решения.',
-];
-
 export const useAppStore = create<AppState>((set, get) => ({
   currentPage: 'chat',
   currentChatId: null,
   chats: [],
   sidebarOpen: true,
   darkMode: false,
+  isLoading: false,
   profile: {
     name: 'Пользователь',
     email: 'user@example.com',
@@ -92,7 +88,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       };
     }),
 
-  sendMessage: (content) => {
+  sendMessage: async (content) => {
     const state = get();
     let chatId = state.currentChatId;
 
@@ -110,6 +106,7 @@ export const useAppStore = create<AppState>((set, get) => ({
     };
 
     set((s) => ({
+      isLoading: true,
       chats: s.chats.map((c) =>
         c.id === chatId
           ? {
@@ -122,23 +119,58 @@ export const useAppStore = create<AppState>((set, get) => ({
       ),
     }));
 
-    setTimeout(() => {
+    const currentState = get();
+    const chat = currentState.chats.find((c) => c.id === chatId);
+    const { settings } = currentState;
+
+    const historyMessages = settings.memory
+      ? (chat?.messages ?? []).map((m) => ({ role: m.role, content: m.content }))
+      : [{ role: 'user' as const, content }];
+
+    try {
+      const res = await fetch(CHAT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: historyMessages,
+          style: settings.style,
+          temperature: settings.temperature,
+        }),
+      });
+
+      const data = await res.json();
+
       const aiMsg: Message = {
         id: generateId(),
         role: 'assistant',
-        content:
-          DEMO_RESPONSES[Math.floor(Math.random() * DEMO_RESPONSES.length)] +
-          '\n\nЭто демо-режим. Для подключения реального ИИ настройте API в разделе Настройки.',
+        content: data.reply || data.error || 'Что-то пошло не так. Попробуйте ещё раз.',
         timestamp: new Date(),
       };
+
       set((s) => ({
+        isLoading: false,
         chats: s.chats.map((c) =>
           c.id === chatId
             ? { ...c, messages: [...c.messages, aiMsg], updatedAt: new Date() }
             : c
         ),
       }));
-    }, 900);
+    } catch {
+      const errMsg: Message = {
+        id: generateId(),
+        role: 'assistant',
+        content: 'Не удалось связаться с сервером. Проверьте подключение и попробуйте снова.',
+        timestamp: new Date(),
+      };
+      set((s) => ({
+        isLoading: false,
+        chats: s.chats.map((c) =>
+          c.id === chatId
+            ? { ...c, messages: [...c.messages, errMsg], updatedAt: new Date() }
+            : c
+        ),
+      }));
+    }
   },
 
   updateProfile: (profile) =>
